@@ -1,5 +1,6 @@
 package com.example.test.just_to_code.code;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +24,15 @@ import java.util.logging.Logger;
 
     class TaskDto {
 
-        //    @JsonProperty
         private String description;
-        //    @JsonProperty
         private Long priority;
 
-        public TaskDto() { }
+        TaskDto(String description, Long priority) {
+            this.description = description;
+            this.priority = priority;
+        }
+
+//        TaskDto() { }
 
         public String getDescription() {
             return description;
@@ -84,33 +87,33 @@ import java.util.logging.Logger;
         private String description;
         private Long priority;
 
-        public Task(Long id, String description, Long priority) {
+        Task(Long id, String description, Long priority) {
             this.id = id;
             this.description = description;
             this.priority = priority;
             isValid(true);
         }
 
-        public Task(Long id, TaskDto taskDto) {
+        Task(Long id, TaskDto taskDto) {
             this.id = id;
             this.description = taskDto.getDescription();
             this.priority = taskDto.getPriority();
             isValid(true);
         }
 
-        public Task(String description, Long priority) {
+        Task(String description, Long priority) {
             this.description = description;
             this.priority = priority;
             isValid(false);
         }
 
-        public Task(TaskDto taskDto) {
+        Task(TaskDto taskDto) {
             this.description = taskDto.getDescription();
             this.priority = taskDto.getPriority();
             isValid(false);
         }
 
-        public Task() {
+        Task() {
 
         }
 
@@ -225,9 +228,9 @@ import java.util.logging.Logger;
     class TaskService implements TaskPort {
 
         @Autowired
-        public final TaskRepository taskRepo;
+        private final TaskRepository taskRepo;
 
-        public TaskService(TaskRepository taskRepo) {
+        TaskService(TaskRepository taskRepo) {
             this.taskRepo = taskRepo;
         }
 

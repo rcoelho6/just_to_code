@@ -1,8 +1,6 @@
 package com.example.test.just_to_code.code;
 
-import com.example.test.just_to_code.code.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,9 +37,7 @@ class TaskControllerTest {
 
     @Test
     void update_success() {
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto("desc", 1L);
 
         ResponseEntity<Object> res = controller.update(1L, dto);
 
@@ -53,9 +49,7 @@ class TaskControllerTest {
     void update_restClientException() {
         doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskPort).update(any());
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto("desc", 1L);
 
         ResponseEntity<Object> res = controller.update(1L, dto);
 
@@ -70,9 +64,7 @@ class TaskControllerTest {
     void update_genericException() {
         doThrow(new RuntimeException("boom")).when(taskPort).update(any());
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto("desc", 1L);
 
         ResponseEntity<Object> res = controller.update(1L, dto);
 
@@ -86,9 +78,7 @@ class TaskControllerTest {
 
     @Test
     void create_success() {
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto("desc", 1L);
 
         Task result = new Task(dto);
         result.setDescription("desc");
@@ -107,9 +97,7 @@ class TaskControllerTest {
     void create_restClientException() {
         doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskPort).create(any());
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto("desc", 1L);
 
         ResponseEntity<Object> res = controller.create(dto);
 
@@ -124,9 +112,7 @@ class TaskControllerTest {
     void create_genericException() {
         doThrow(new RuntimeException("boom")).when(taskPort).create(any());
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto("desc", 1L);
 
         ResponseEntity<Object> res = controller.create(dto);
 
@@ -195,7 +181,8 @@ class TaskServiceTest {
 
 }
 
-@SpringBootTest
+@SpringBootTest(properties = {"spring.jackson.deserialization.fail-on-unknown-properties=false"
+                             ,"spring.jackson.deserialization.fail-on-missing-creator-properties=false"})
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = Replace.ANY)
 class TaskControllerIntegrationTest {
@@ -214,9 +201,7 @@ class TaskControllerIntegrationTest {
         taskRepo.deleteAll();
         Task existing = taskRepo.save(new Task( "old", 1L));
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("new");
-        dto.setPriority(2L);
+        TaskDto dto = new TaskDto("new", 2L);
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -233,9 +218,7 @@ class TaskControllerIntegrationTest {
     void update_notFound_returns404() throws Exception {
         taskRepo.deleteAll();
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto("desc", 1L);
 
         mockMvc.perform(put("/tasks/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -248,8 +231,7 @@ class TaskControllerIntegrationTest {
         taskRepo.deleteAll();
         Task existing = taskRepo.save(new Task( "old", 1L));
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("desc");
+        TaskDto dto = new TaskDto("desc", null);
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -262,8 +244,7 @@ class TaskControllerIntegrationTest {
         taskRepo.deleteAll();
         Task existing = taskRepo.save(new Task( "old", 1L));
 
-        TaskDto dto = new TaskDto();
-        dto.setPriority(1L);
+        TaskDto dto = new TaskDto(null, 1L);
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -342,9 +323,7 @@ class TaskControllerIntegrationTest {
         taskRepo.deleteAll();
         taskRepo.save(new Task( "old", 1L));
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("new");
-        dto.setPriority(2L);
+        TaskDto dto = new TaskDto("new", 2L);
 
         mockMvc.perform(put("/tasks/{id}", "null")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -357,9 +336,7 @@ class TaskControllerIntegrationTest {
         taskRepo.deleteAll();
         taskRepo.save(new Task( "old", 1L));
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("new");
-        dto.setPriority(2L);
+        TaskDto dto = new TaskDto("new", 2L);
 
         mockMvc.perform(put("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -372,9 +349,7 @@ class TaskControllerIntegrationTest {
         taskRepo.deleteAll();
         taskRepo.save(new Task( "old", 1L));
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("new");
-        dto.setPriority(2L);
+        TaskDto dto = new TaskDto("new", 2L);
 
         mockMvc.perform(put("/tasks/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -386,9 +361,7 @@ class TaskControllerIntegrationTest {
     void create_persists_to_db() throws Exception {
         taskRepo.deleteAll();
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("created");
-        dto.setPriority(5L);
+        TaskDto dto = new TaskDto("created", 5L);
 
         var mvcResult = mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -412,9 +385,7 @@ class TaskControllerIntegrationTest {
     void create_persists_two_equals_to_db() throws Exception {
         taskRepo.deleteAll();
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("created");
-        dto.setPriority(5L);
+        TaskDto dto = new TaskDto("created", 5L);
 
         taskRepo.save(new Task(dto));
 
@@ -440,8 +411,7 @@ class TaskControllerIntegrationTest {
     void create_null_desc_400() throws Exception {
         taskRepo.deleteAll();
 
-        TaskDto dto = new TaskDto();
-        dto.setPriority(5L);
+        TaskDto dto = new TaskDto(null, 5L);
 
         mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -453,8 +423,7 @@ class TaskControllerIntegrationTest {
     void create_null_prior_400() throws Exception {
         taskRepo.deleteAll();
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("created");
+        TaskDto dto = new TaskDto("created", null);
 
         mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -463,35 +432,61 @@ class TaskControllerIntegrationTest {
     }
 
     @Test
-    void create_empty_desc_400() throws Exception {
+    void create_missing_desc_400() throws Exception {
         taskRepo.deleteAll();
 
-        mockMvc.perform(post("/tasks")
+        var result = mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"priority\": 5 }"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        var error = result.getResponse().getContentAsString();
+        assertTrue(error.contains("Description cannot be null or blank"));
+
     }
 
     @Test
-    void create_empty_prior_400() throws Exception {
+    void create_missing_prior_400() throws Exception {
         taskRepo.deleteAll();
 
-        TaskDto dto = new TaskDto();
-        dto.setPriority(5L);
+        var result = mockMvc.perform(post("/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"description\": \"desc\" }"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        var error = result.getResponse().getContentAsString();
+        assertTrue(error.contains("Erro with status 400: 400 Priority cannot be null or negative"));
+    }
+
+    @Test
+    void update_extra_field_ok() throws Exception {
+        taskRepo.deleteAll();
+
+        Task created = taskRepo.save(new Task("created", 15L));
+
+        mockMvc.perform(put("/tasks/{id}", created.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"description\": \"updated\", \"priority\": 10, \"extra\": 0 }"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    void create_extra_field_ok() throws Exception {
+        taskRepo.deleteAll();
 
         mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{ \"description\": \"desc\""))
-                .andExpect(status().isBadRequest());
+                        .content("{ \"description\": \"created\", \"priority\": 5, \"extra\": 0 }"))
+                .andExpect(status().isCreated());
     }
 
     @Test
     void create_send_id() throws Exception {
         taskRepo.deleteAll();
 
-        TaskDto dto = new TaskDto();
-        dto.setDescription("created");
-        dto.setPriority(5L);
+        TaskDto dto = new TaskDto("created", 5L);
 
         mockMvc.perform(post("/tasks/1")
                         .contentType(MediaType.APPLICATION_JSON)
