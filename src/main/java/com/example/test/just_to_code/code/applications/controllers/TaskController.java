@@ -1,5 +1,9 @@
-package com.example.test.just_to_code.code;
+package com.example.test.just_to_code.code.applications.controllers;
 
+import com.example.test.just_to_code.code.usecases.boundaries.TaskIncomeBoundary;
+import com.example.test.just_to_code.code.applications.presenters.TaskDto;
+import com.example.test.just_to_code.code.applications.presenters.TaskErrorDto;
+import com.example.test.just_to_code.code.usecases.domains.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,18 +19,17 @@ public class TaskController {
 
     private static final Logger log = Logger.getLogger("Solution");
 
-    public final TaskPort taskPort;
+    public final TaskIncomeBoundary taskIncomeBoundary;
 
-    public TaskController(TaskPort taskPort) {
-        this.taskPort = taskPort;
+    public TaskController(TaskIncomeBoundary taskIncomeBoundary) {
+        this.taskIncomeBoundary = taskIncomeBoundary;
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable("id") Long id
             , @RequestBody TaskDto taskDto) {
         try {
-            Task task = new Task(id, taskDto);
-            taskPort.update(task);
+            taskIncomeBoundary.update(taskDto.toDomain(id));
         } catch (RestClientResponseException ex) {
             String msg = String.format("Erro with status %d: %s", ex.getStatusCode().value(), ex.getMessage());
             log.info(msg);
@@ -46,9 +49,8 @@ public class TaskController {
         String path = TaskController.class.getAnnotation(RequestMapping.class).value()[0];
         UriBuilder uri = UriComponentsBuilder.fromPath(path);
         try {
-            Task task = new Task(taskDto);
-            Task result = taskPort.create(task);
-            uri.pathSegment(result.getId().toString());
+            Task result = taskIncomeBoundary.create(taskDto.toDomain());
+            uri.pathSegment(result.id().toString());
         } catch (RestClientResponseException ex) {
             String msg = String.format("Erro with status %d: %s", ex.getStatusCode().value(), ex.getMessage());
             log.info(msg);

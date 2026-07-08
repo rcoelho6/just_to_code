@@ -1,5 +1,10 @@
 package com.example.test.just_to_code.code;
 
+import com.example.test.just_to_code.code.applications.controllers.TaskController;
+import com.example.test.just_to_code.code.applications.presenters.TaskDto;
+import com.example.test.just_to_code.code.applications.presenters.TaskErrorDto;
+import com.example.test.just_to_code.code.infrastructures.models.TaskModel;
+import com.example.test.just_to_code.code.usecases.boundaries.TaskIncomeBoundary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TaskControllerTest {
+class TaskModelControllerTest {
 
     @Mock
-    TaskPort taskPort;
+    TaskIncomeBoundary taskIncomeBoundary;
 
     @InjectMocks
     TaskController controller;
@@ -35,7 +40,7 @@ class TaskControllerTest {
 
     @Test
     void update_restClientException() {
-        doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskPort).update(any());
+        doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskIncomeBoundary).update(any());
 
         TaskDto dto = new TaskDto();
         dto.setDescription("desc");
@@ -52,7 +57,7 @@ class TaskControllerTest {
 
     @Test
     void update_genericException() {
-        doThrow(new RuntimeException("boom")).when(taskPort).update(any());
+        doThrow(new RuntimeException("boom")).when(taskIncomeBoundary).update(any());
 
         TaskDto dto = new TaskDto();
         dto.setDescription("desc");
@@ -74,12 +79,12 @@ class TaskControllerTest {
         dto.setDescription("desc");
         dto.setPriority(1L);
 
-        Task result = new Task(dto);
+        TaskModel result = new TaskModel(dto.toDomain());
         result.setDescription("desc");
         result.setPriority(1L);
         result.setId(11L);
 
-        doReturn(result).when(taskPort).create(any());
+        doReturn(result.toDomain()).when(taskIncomeBoundary).create(any());
 
         ResponseEntity<Object> res = controller.create(dto);
 
@@ -89,7 +94,7 @@ class TaskControllerTest {
 
     @Test
     void create_restClientException() {
-        doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskPort).create(any());
+        doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskIncomeBoundary).create(any());
 
         TaskDto dto = new TaskDto();
         dto.setDescription("desc");
@@ -106,7 +111,7 @@ class TaskControllerTest {
 
     @Test
     void create_genericException() {
-        doThrow(new RuntimeException("boom")).when(taskPort).create(any());
+        doThrow(new RuntimeException("boom")).when(taskIncomeBoundary).create(any());
 
         TaskDto dto = new TaskDto();
         dto.setDescription("desc");

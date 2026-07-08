@@ -1,5 +1,8 @@
 package com.example.test.just_to_code.code;
 
+import com.example.test.just_to_code.code.applications.presenters.TaskDto;
+import com.example.test.just_to_code.code.infrastructures.models.TaskModel;
+import com.example.test.just_to_code.code.infrastructures.repositories.TaskRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = Replace.ANY)
-class TaskControllerIntegrationTest {
+class TaskModelControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,7 +37,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_persists_to_db() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         TaskDto dto = new TaskDto();
         dto.setDescription("new");
@@ -45,7 +48,7 @@ class TaskControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
 
-        Optional<Task> updated = taskRepo.findById(existing.getId());
+        Optional<TaskModel> updated = taskRepo.findById(existing.getId());
         assertTrue(updated.isPresent());
         assertEquals("new", updated.get().getDescription());
         assertEquals(2L, updated.get().getPriority());
@@ -68,7 +71,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_no_priority_returns400() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         TaskDto dto = new TaskDto();
         dto.setDescription("desc");
@@ -82,7 +85,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_no_desc_returns400() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         TaskDto dto = new TaskDto();
         dto.setPriority(1L);
@@ -96,7 +99,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_empty_json_body() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -107,7 +110,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_null_body() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +121,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_no_desc_field_json() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -129,7 +132,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_null_priority_field_json() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -140,7 +143,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_null_desc_field_json() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +154,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_no_priority_field_json() throws Exception {
         taskRepo.deleteAll();
-        Task existing = taskRepo.save(new Task( "old", 1L));
+        TaskModel existing = taskRepo.save(new TaskModel( "old", 1L));
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,7 +165,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_null_string_id() throws Exception {
         taskRepo.deleteAll();
-        taskRepo.save(new Task( "old", 1L));
+        taskRepo.save(new TaskModel( "old", 1L));
 
         TaskDto dto = new TaskDto();
         dto.setDescription("new");
@@ -177,7 +180,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_null_without_slash_id() throws Exception {
         taskRepo.deleteAll();
-        taskRepo.save(new Task( "old", 1L));
+        taskRepo.save(new TaskModel( "old", 1L));
 
         TaskDto dto = new TaskDto();
         dto.setDescription("new");
@@ -192,7 +195,7 @@ class TaskControllerIntegrationTest {
     @Test
     void update_null_with_slash_id() throws Exception {
         taskRepo.deleteAll();
-        taskRepo.save(new Task( "old", 1L));
+        taskRepo.save(new TaskModel( "old", 1L));
 
         TaskDto dto = new TaskDto();
         dto.setDescription("new");
@@ -238,7 +241,7 @@ class TaskControllerIntegrationTest {
         dto.setDescription("created");
         dto.setPriority(5L);
 
-        taskRepo.save(new Task(dto));
+        taskRepo.save(new TaskModel(dto.toDomain()));
 
         var mvcResult = mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
