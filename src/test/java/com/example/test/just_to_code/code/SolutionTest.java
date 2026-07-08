@@ -1,24 +1,199 @@
 package com.example.test.just_to_code.code;
 
-import com.example.test.just_to_code.code.controllers.dtos.TaskDto;
-import com.example.test.just_to_code.code.repositories.TaskRepository;
-import com.example.test.just_to_code.code.repositories.models.Task;
+import com.example.test.just_to_code.code.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ExtendWith(MockitoExtension.class)
+class TaskControllerTest {
+
+    @Mock
+    TaskPort taskPort;
+
+    @InjectMocks
+     TaskController controller;
+
+    @Test
+    void update_success() {
+        TaskDto dto = new TaskDto();
+        dto.setDescription("desc");
+        dto.setPriority(1L);
+
+        ResponseEntity<Object> res = controller.update(1L, dto);
+
+        assertEquals(HttpStatus.OK.value(), res.getStatusCodeValue());
+        assertEquals(dto, res.getBody());
+    }
+
+    @Test
+    void update_restClientException() {
+        doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskPort).update(any());
+
+        TaskDto dto = new TaskDto();
+        dto.setDescription("desc");
+        dto.setPriority(1L);
+
+        ResponseEntity<Object> res = controller.update(1L, dto);
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getStatusCodeValue());
+        assertTrue(res.getBody() instanceof TaskErrorDto);
+        TaskErrorDto err = (TaskErrorDto) res.getBody();
+        assertEquals(HttpStatus.BAD_REQUEST.value(), err.getStatus());
+        assertTrue(err.getMessage().contains("Erro with status"));
+    }
+
+    @Test
+    void update_genericException() {
+        doThrow(new RuntimeException("boom")).when(taskPort).update(any());
+
+        TaskDto dto = new TaskDto();
+        dto.setDescription("desc");
+        dto.setPriority(1L);
+
+        ResponseEntity<Object> res = controller.update(1L, dto);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), res.getStatusCodeValue());
+        assertTrue(res.getBody() instanceof TaskErrorDto);
+        TaskErrorDto err = (TaskErrorDto) res.getBody();
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getStatus());
+        assertTrue(err.getMessage().contains("Unexpected error"));
+    }
+
+
+    @Test
+    void create_success() {
+        TaskDto dto = new TaskDto();
+        dto.setDescription("desc");
+        dto.setPriority(1L);
+
+        Task result = new Task(dto);
+        result.setDescription("desc");
+        result.setPriority(1L);
+        result.setId(11L);
+
+        doReturn(result).when(taskPort).create(any());
+
+        ResponseEntity<Object> res = controller.create(dto);
+
+        assertEquals(HttpStatus.CREATED.value(), res.getStatusCodeValue());
+        assertEquals(dto, res.getBody());
+    }
+
+    @Test
+    void create_restClientException() {
+        doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad request")).when(taskPort).create(any());
+
+        TaskDto dto = new TaskDto();
+        dto.setDescription("desc");
+        dto.setPriority(1L);
+
+        ResponseEntity<Object> res = controller.create(dto);
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), res.getStatusCodeValue());
+        assertTrue(res.getBody() instanceof TaskErrorDto);
+        TaskErrorDto err = (TaskErrorDto) res.getBody();
+        assertEquals(HttpStatus.BAD_REQUEST.value(), err.getStatus());
+        assertTrue(err.getMessage().contains("Erro with status"));
+    }
+
+    @Test
+    void create_genericException() {
+        doThrow(new RuntimeException("boom")).when(taskPort).create(any());
+
+        TaskDto dto = new TaskDto();
+        dto.setDescription("desc");
+        dto.setPriority(1L);
+
+        ResponseEntity<Object> res = controller.create(dto);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), res.getStatusCodeValue());
+        assertTrue(res.getBody() instanceof TaskErrorDto);
+        TaskErrorDto err = (TaskErrorDto) res.getBody();
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), err.getStatus());
+        assertTrue(err.getMessage().contains("Unexpected error"));
+    }
+
+}
+
+
+@ExtendWith(MockitoExtension.class)
+class TaskServiceTest {
+
+    @Mock
+    TaskRepository taskRepo;
+
+    @InjectMocks
+    TaskService taskService;
+
+    @Test
+    void update_whenExistingSame_thenSaveNotCalled() {
+        Task existing = new Task(1L, "desc", 1L);
+        when(taskRepo.findById(1L)).thenReturn(Optional.of(existing));
+
+        Task task = new Task(1L, "desc", 1L);
+        taskService.update(task);
+
+        verify(taskRepo, never()).save(any());
+    }
+
+    @Test
+    void update_whenExistingDifferent_thenSaveCalled() {
+        Task existing = new Task(1L, "old", 1L);
+        when(taskRepo.findById(1L)).thenReturn(Optional.of(existing));
+
+        Task task = new Task(1L, "new", 2L);
+        taskService.update(task);
+
+        verify(taskRepo).save(task);
+    }
+
+    @Test
+    void update_whenNotFound_thenThrows() {
+        when(taskRepo.findById(2L)).thenReturn(Optional.empty());
+
+        Task task = new Task(2L, "desc", 1L);
+        assertThrows(HttpClientErrorException.class, () -> taskService.update(task));
+    }
+
+    @Test
+    void create_whenValid_thenCallsSaveAndReturnsSavedTask() {
+        // create without id (new task)
+        Task toCreate = new Task("new task", 1L);
+        Task saved = new Task(5L, "new task", 1L);
+
+        when(taskRepo.save(toCreate)).thenReturn(saved);
+
+        Task result = taskService.create(toCreate);
+
+        verify(taskRepo).save(toCreate);
+        assertSame(saved, result);
+    }
+
+}
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -44,8 +219,8 @@ class TaskControllerIntegrationTest {
         dto.setPriority(2L);
 
         mockMvc.perform(put("/tasks/{id}", existing.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
 
         Optional<Task> updated = taskRepo.findById(existing.getId());
@@ -63,8 +238,8 @@ class TaskControllerIntegrationTest {
         dto.setPriority(1L);
 
         mockMvc.perform(put("/tasks/{id}", 999L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNotFound());
     }
 
@@ -216,8 +391,8 @@ class TaskControllerIntegrationTest {
         dto.setPriority(5L);
 
         var mvcResult = mockMvc.perform(post("/tasks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
@@ -318,7 +493,7 @@ class TaskControllerIntegrationTest {
         dto.setDescription("created");
         dto.setPriority(5L);
 
-       mockMvc.perform(post("/tasks/1")
+        mockMvc.perform(post("/tasks/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isMethodNotAllowed());
