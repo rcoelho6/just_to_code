@@ -2,26 +2,11 @@
 
 A Spring Boot project designed as a **sandbox and reference implementation** for Proofs of Concepts (POCs), architectural experiments, and design pattern exploration.
 
-## 🏛️ Architecture
-
-### Current Implementation (Main Branch)
-
-The current implementation follows a **layered architecture** with:
-
-- **Controller Layer** - HTTP request handling
-- **Service Layer** - Business logic and orchestration
-- **Repository Layer** - Data persistence (Spring Data JPA)
-- **Model Layer** - Domain objects and entities
+## 🏛️ Architecture (Clean Architecture Version)
 
 ### Clean Architecture Implementation
 
-For a **Clean Architecture** approach to the same API, check out the **`feat/clean-arch`** branch:
-
-```bash
-git checkout feat/clean-arch
-```
-
-This branch implements the same Task Management API using **Clean Architecture principles**, featuring:
+The current implementation follows a **Clean Architecture** approach (this **`feat/clean-arch`** branch) featuring:
 
 - **Independent Layer Structure** - Business logic separated from frameworks
 - **Use Cases** - Core application workflows isolated
@@ -38,6 +23,21 @@ This branch implements the same Task Management API using **Clean Architecture p
 ├── gateways/          # External system boundaries
 └── presenters/        # Response formatting
 ```
+
+### Other Implementation (Main Branch)
+
+For simpler Architecture implementation use main branch:
+
+```bash
+git checkout main
+```
+
+This branch implements the same API using **layered architecture** principles:
+
+- **Controller Layer** - HTTP request handling
+- **Service Layer** - Business logic and orchestration
+- **Repository Layer** - Data persistence (Spring Data JPA)
+- **Model Layer** - Domain objects and entities
 
 ## 🛠️ Technology Stack
 
