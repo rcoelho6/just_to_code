@@ -1,11 +1,13 @@
 package com.example.test.just_to_code.code;
 
+import com.example.test.just_to_code.code.repositories.TaskRepository;
+import com.example.test.just_to_code.code.repositories.models.Task;
+import com.example.test.just_to_code.code.services.TaskService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Optional;
@@ -55,7 +57,7 @@ class TaskServiceTest {
     @Test
     void create_whenValid_thenCallsSaveAndReturnsSavedTask() {
         // create without id (new task)
-        Task toCreate = new Task(null, "new task", 1L);
+        Task toCreate = new Task("new task", 1L);
         Task saved = new Task(5L, "new task", 1L);
 
         when(taskRepo.save(toCreate)).thenReturn(saved);

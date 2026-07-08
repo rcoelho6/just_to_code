@@ -1,4 +1,4 @@
-package com.example.test.just_to_code.code;
+package com.example.test.just_to_code.code.controllers.dtos;
 
 import java.util.Objects;
 
