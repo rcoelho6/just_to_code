@@ -1,5 +1,8 @@
 package com.example.test.just_to_code.code;
 
+import com.example.test.just_to_code.code.controllers.dtos.TaskDto;
+import com.example.test.just_to_code.code.repositories.TaskRepository;
+import com.example.test.just_to_code.code.repositories.models.Task;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

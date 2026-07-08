@@ -1,5 +1,6 @@
-package com.example.test.just_to_code.code;
+package com.example.test.just_to_code.code.repositories.models;
 
+import com.example.test.just_to_code.code.controllers.dtos.TaskDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

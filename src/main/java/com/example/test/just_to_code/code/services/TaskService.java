@@ -1,5 +1,7 @@
-package com.example.test.just_to_code.code;
+package com.example.test.just_to_code.code.services;
 
+import com.example.test.just_to_code.code.repositories.models.Task;
+import com.example.test.just_to_code.code.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

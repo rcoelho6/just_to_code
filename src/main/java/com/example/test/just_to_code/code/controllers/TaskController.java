@@ -1,5 +1,9 @@
-package com.example.test.just_to_code.code;
+package com.example.test.just_to_code.code.controllers;
 
+import com.example.test.just_to_code.code.repositories.models.Task;
+import com.example.test.just_to_code.code.controllers.dtos.TaskDto;
+import com.example.test.just_to_code.code.controllers.dtos.TaskErrorDto;
+import com.example.test.just_to_code.code.services.TaskPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
