@@ -1,43 +1,19 @@
-# Just to Code - POC & Experimentation Playground
+# Replicate a specific exam to test spring configs impacts
 
-A Spring Boot project designed as a **sandbox and reference implementation** for Proofs of Concepts (POCs), architectural experiments, and design pattern exploration.
+## 🆘 Why
 
-## 🏛️ Architecture
+This possibility shows how spring proprieties might affect the response and usability of an API.
 
-### Current Implementation (Main Branch)
+### 👀 Testing this case
 
-The current implementation follows a **layered architecture** with:
+#### Properties on:
 
-- **Controller Layer** - HTTP request handling
-- **Service Layer** - Business logic and orchestration
-- **Repository Layer** - Data persistence (Spring Data JPA)
-- **Model Layer** - Domain objects and entities
+Integrated tests for those cases:
+- ***create_extra_field_ok***: Create Task with extra field and expect 201
+- ***update_extra_field_ok***: Create Task with extra field and expect 200
+- ***create_missing_desc_400***: Create Task with missing description field and expect 400 with specific message
+- ***create_missing_prior_400***: Create Task with missing priority field and expect 400 with specific message
 
-### Clean Architecture Implementation
-
-For a **Clean Architecture** approach to the same API, check out the **`feat/clean-arch`** branch:
-
-```bash
-git checkout feat/clean-arch
-```
-
-This branch implements the same Task Management API using **Clean Architecture principles**, featuring:
-
-- **Independent Layer Structure** - Business logic separated from frameworks
-- **Use Cases** - Core application workflows isolated
-- **Domain Entities** - Pure business rules without framework dependencies
-- **Adapters** - Explicit boundaries for external systems
-- **Ports & Adapters Pattern** - Framework-agnostic interfaces
-- **Dependency Inversion** - Dependencies point inward to business logic
-
-**Key Directories in `feat/clean-arch`:**
-```
-├── usecases/          # Application business rules
-├── domains/           # Pure business entities
-├── adapters/          # Framework implementations
-├── gateways/          # External system boundaries
-└── presenters/        # Response formatting
-```
 
 ## 🛠️ Technology Stack
 
@@ -53,55 +29,36 @@ This branch implements the same Task Management API using **Clean Architecture p
 
 This POC playground includes examples of:
 
-- ✅ RESTful API design patterns
-- ✅ Unit testing with mocks and Mockito
-- ✅ Spring Boot configuration and best practices
-- ✅ JPA/Hibernate integration
-- ✅ Error handling and validation strategies
-- ✅ Layered architecture pattern
-- ✅ SOLID principles application in practice
-- ✅ Dependency Injection patterns
-- ✅ Clean code principles
+- ✅ Just simulate an Exam where JSON parser fails when missing properties
+
 
 ## 🎓 Learning Resources for References
 
-### Architecture Patterns Explored
+### That Hardcoded Deterministic Exams are worthless
 
-- [Layered Architecture](https://en.wikipedia.org/wiki/Multitier_architecture) - Current implementation
-- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) - `feat/clean-arch` branch
-- Hexagonal Architecture (Ports & Adapters)
-- Domain-Driven Design (DDD) concepts
+- The global software engineering community largely agrees that Codility and similar platforms are poor tools for evaluating high-level professionals (Senior, Staff, and Principal engineers).
+- They fail significantly when it comes to measuring the maturity of an experienced engineer.
 
-### Best Practices Demonstrated
+### When to use Hardcoded Deterministic
 
-- Separation of Concerns
-- Dependency Injection
-- Interface-based programming
-- Test-Driven Development (TDD)
-- Mock-based unit testing
+- they are excellent for screening thousands of junior candidates during the initial stages
+
+### Why Hardcoded Deterministic fails for Senior and above
+
+- Focus on Rote Memorization of Algorithms, Commands and Expressions. While does not validate real life expertise like Correct usage of possible solutions, high level patterns application and decisions, ability to choose or use architecture and engineering possibilities, and others.
+- There is a lack of context regarding how they are applied as solutions, given that these exams focus on solving problems in pre-established ways, without allowing for analysis.
+- These exams tend to obscure a significant part of the design, configuration, engineer and tests aspects of the projects and apps, making high-level professionals uncomfortable, as they are accustomed to analyzing every possible context.
+- Highly qualified professionals often fail because these concepts are not part of their day-to-day work. Topics such as highly specific algorithm theory, bitwise operations, and the like are geared toward academia and are rarely used in real-world contexts. Furthermore, the testing format—featuring tight time limits and unrealistic pacing—can make these professionals uncomfortable during the exam, given that they have (most likely) been away from that academic environment for years.
 
 ## 📋 Overview
 
-This project serves as a **practical playground** for:
-
-- 🏗️ **Architectural Pattern Exploration** - Testing different design patterns and architectures
-- 🧪 **POC Development**
-- 📚 **Learning Reference** - Clean examples of Spring Boot best practices
-- 🔄 **Pattern Comparison** - Side-by-side implementations of different approaches
-- 💡 **Technical Experimentation** - Validating new frameworks, libraries, and techniques
+- As we don´t access for all properties and config, it hard to know what might happens in complex scenario like running a fully working spring API
+- High level professional will not does deliver a code, but a fully developed software. So all possible config and aspects must be well-informed.
+- This branch has a goal to understand what was happan on the exam e simulate it. So it maight prove that this kind of exam a terrible.
 
 ## 🎯 Project Aim
 
-This repository is meant to be a **sandbox environment** where developers can:
-
-1. **Experiment with POCs** - Build proofs of concepts without production constraints
-2. **Test architectural patterns** - Implement solutions using different architectural approaches
-3. **Apply SOLID principles** - Practice clean code and design principles in real-world scenarios
-4. **Explore design patterns** - Reference implementations of common and advanced patterns
-5. **Prototype new features** - Validate technical approaches before production implementation
-6. **Document learnings** - Create working examples for team knowledge sharing
-
-## 🏃 Quick Start
+- 🔄 This case is just to prove erros on a specific exam.
 
 ### Prerequisites
 
@@ -167,25 +124,6 @@ Tests are written using:
 - **JUnit 5** - Test framework
 - **Mockito** - Mocking framework
 - **Spring Test** - Spring Boot testing utilities
-
-## 🔄 Branching Strategy
-
-| Branch | Purpose | Architecture |
-|--------|---------|--------------|
-| `main` | Primary implementation and POCs | Layered Architecture |
-| `feat/clean-arch` | Clean Architecture reference | Clean/Hexagonal Architecture |
-| `feat/*` | Feature branches and experiments | Various patterns |
-
-## 🚀 Contributing & Adding POCs
-
-Feel free to:
-
-1. **Create feature branches** - `feat/new-poc-name` for new proofs of concepts
-2. **Add new modules** - Implement different POCs within this sandbox
-3. **Experiment with patterns** - Try different architectural approaches
-4. **Test frameworks/libraries** - Validate new technologies in isolation
-5. **Document learnings** - Add comments and examples of what you discovered
-6. **Submit pull requests** - Share your POCs and experiments with the team
 
 ### Adding a New POC
 
