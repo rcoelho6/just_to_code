@@ -31,7 +31,7 @@ class TaskDto {
         this.priority = priority;
     }
 
-//    TaskDto() { }
+    TaskDto() { }
 
     public String getDescription() {
         return description;

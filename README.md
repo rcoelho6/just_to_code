@@ -1,12 +1,43 @@
-# Replicate a specific exam to test spring configs impacts
+# Error on Exam caused by ObjectMapper Bean Properties
 
-## 🆘 Why
+## 🆘 About this possibility
 
-This possibility shows how spring proprieties might affect the response and usability of an API.
+This possibility shows how overridden (Jackson) beans might affect the response and usability of an API.
+
+### ❌ What does it affect
+
+- This changes how Spring and Jackson Framework manipulate the income content
+- Here was changes the response of this application for:
+    - Missing content field (note: not empty or null field, but non-informed field)
+    - Extra field on content (note: a field that was not read by the application at all)
+- The we might have two results, depending on the properties are or or off (true or false)
+    - On: This content is reject during the content reading (deserialization)
+    - Off: If it is a extra field, just ignore it. If, it is a missing field, set the DTO property as null.
 
 ### 👀 Testing this case
 
 #### Properties on:
+
+Jackson ObjectMapper config overrides the properties:
+
+```properties
+DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES
+```
+
+Spring does the same as the with:
+
+```properties
+spring.jackson.deserialization.fail-on-unknown-properties
+spring.jackson.deserialization.fail-on-missing-creator-properties
+```
+
+For this configuration we used the `Jackson2ObjectMapperBuilder`, but there are others ways to change theses configs when creating `ObjectMapper` Bean:
+
+```Java
+buider.failOnUnknownProperties(true);
+buider.featuresToDisable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
+```
 
 Integrated tests for those cases:
 - ***create_extra_field_ok***: Create Task with extra field and expect 201
@@ -14,6 +45,34 @@ Integrated tests for those cases:
 - ***create_missing_desc_400***: Create Task with missing description field and expect 400 with specific message
 - ***create_missing_prior_400***: Create Task with missing priority field and expect 400 with specific message
 
+#### Specifics needs
+
+For this cases, doesn't matters with the DTO has or not a default constructor.
+
+![no_def_cons.png](imgs/with_def_cons.png)
+
+#### Properties on:
+
+Setting ObjectMapper Bean on test case:
+
+![mapper_bean_config_true.png](imgs/mapper_bean_config_true.png)
+Tests result for those cases:
+
+![tests_errors.png](imgs/tests_errors.png)
+
+#### Properties off:
+
+Setting ObjectMapper Bean on test case:
+
+![mapper_bean_config_false.png](imgs/mapper_bean_config_false.png)
+
+❗ This is the default configuration of the ObjectMapper, so you might just remove the specific config for the project:
+
+![mapper_bean_config_false_commented.png](imgs/mapper_bean_config_false_commented.png)
+
+Tests result for those cases:
+
+![tests_ok.png](imgs/tests_ok.png)
 
 ## 🛠️ Technology Stack
 
