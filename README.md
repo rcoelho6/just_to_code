@@ -45,12 +45,6 @@ Integrated tests for those cases:
 - ***create_missing_desc_400***: Create Task with missing description field and expect 400 with specific message
 - ***create_missing_prior_400***: Create Task with missing priority field and expect 400 with specific message
 
-#### Specifics needs
-
-For this cases, doesn't matters with the DTO has or not a default constructor.
-
-![no_def_cons.png](imgs/with_def_cons.png)
-
 #### Properties on:
 
 Setting ObjectMapper Bean on test case:
